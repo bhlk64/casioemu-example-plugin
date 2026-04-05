@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application
+        android:allowBackup="false"
+        android:hasCode="true"
+        android:label="CasioEmu Example Plugin">
+
+        <meta-data android:name="casioemu.plugin.name" android:value="Example Plugin" />
+        <meta-data android:name="casioemu.plugin.author" android:value="hieuxyz" />
+        <meta-data android:name="casioemu.plugin.version" android:value="1.0.0" />
+        <meta-data android:name="casioemu.plugin.desc" android:value="A simple plugin example." />
+        <meta-data android:name="casioemu.plugin.main_lib" android:value="libExamplePlugin.so" />
+
+        <activity android:name=".PActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="com.tele.u8emulator.PLUGIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
