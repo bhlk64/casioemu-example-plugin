@@ -1,7 +1,8 @@
 #include "PluginApi.h"
 #include "PluginHelper.hpp"
 
-PluginApi* g_api = nullptr;
+static PluginApi* g_api = nullptr;
+static ExampleWindow* wnd = nullptr;
 
 class ExampleWindow : public UIWindow {
 public:
@@ -14,13 +15,21 @@ public:
     }
 };
 
-extern "C" __attribute__((visibility("default"))) void fPluginLoad(PluginApi* api) {
+extern "C" __attribute__((visibility("default")))
+void fPluginLoad(PluginApi* api) {
     if (!api) return;
+
     SetupPluginEnvironment(api);
     g_api = api;
-    
-    if (!api->RegisterPlugin("com.hieuxyz.casioemu.example", "Example Plugin", "1.0.0", "hieuxyz", "A simple example plugin")) {
-        return;
-    }
-    api->AddWindow(new ExampleWindow());
+
+    if (!api->RegisterPlugin(
+        "com.hieuxyz.casioemu.example",
+        "Example Plugin",
+        "1.0.0",
+        "hieuxyz",
+        "A simple example plugin"
+    )) return;
+
+    wnd = new ExampleWindow();
+    api->AddWindow(wnd);
 }

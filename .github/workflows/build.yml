@@ -1,0 +1,88 @@
+name: Auto build and pre-release
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["stable"]
+
+env:
+  BUILD_CONFIGURATION: Release
+
+permissions:
+  contents: write
+
+jobs:
+  build-android:
+    name: Build Android
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v5
+      with:
+        java-version: "21"
+        distribution: temurin
+        cache: gradle
+
+    - name: Grant execute permission
+      run: chmod +x gradlew
+
+    - name: Build APK
+      run: ./gradlew assembleRelease
+
+    - name: Rename APK
+      run: |
+        SHORT_HASH=$(git rev-parse --short HEAD)
+        for apk in app/build/outputs/apk/release/*.apk; do
+          if [ -f "$apk" ]; then
+            mv "$apk" "${apk%.apk}-${SHORT_HASH}.apk"
+          fi
+        done
+
+    - name: Upload APK (universal)
+      uses: actions/upload-artifact@v7
+      with:
+        path: app/build/outputs/apk/release/*-universal-*.apk
+        archive: false
+
+    - name: Dump CMake error (if failed)
+      if: failure()
+      run: |
+        find . -name "CMakeError.log" -exec cat {} \;
+        find . -name "CMakeOutput.log" -exec cat {} \;
+
+  release:
+    name: Create Release
+    needs: build-android
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/stable'
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+
+    - name: Download artifacts
+      uses: actions/download-artifact@v8
+      with:
+        path: ./artifacts
+
+    - name: Prepare release
+      run: |
+        mkdir -p release_assets
+        find ./artifacts -name "*.apk" -exec cp {} release_assets/ \;
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v3
+      with:
+        tag_name: stable-${{ github.sha }}
+        name: "🚧 Android Auto Build"
+        body: "Auto Android build from stable branch"
+        files: release_assets/*
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

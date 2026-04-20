@@ -15,7 +15,7 @@ set(IMGUI_SOURCES
 )
 
 add_library(ExamplePlugin SHARED 
-    "ExamplePlugin.cpp"
+    "*.cpp"
     ${IMGUI_SOURCES}
 )
 
