@@ -1,6 +1,8 @@
 #include "PluginApi.h"
 #include "PluginHelper.hpp"
 
+class ExampleWindow;
+
 static PluginApi* g_api = nullptr;
 static ExampleWindow* wnd = nullptr;
 
