@@ -14,8 +14,12 @@ set(IMGUI_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/imgui/imgui_widgets.cpp"
 )
 
+file(GLOB PLUGIN_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
+)
+
 add_library(ExamplePlugin SHARED 
-    "*.cpp"
+    ${PLUGIN_SOURCES}
     ${IMGUI_SOURCES}
 )
 
