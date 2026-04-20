@@ -39,7 +39,7 @@ jobs:
       uses: actions/upload-artifact@v7
       with:
         name: native-libs
-        path: app/build/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/**/*.so
+        path: app/build/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/arm64-v8a/*.so
         # path: .
         archive: true
 
@@ -68,15 +68,9 @@ jobs:
       run: |
         mkdir -p release_assets
         COMMIT=${GITHUB_SHA::7}
-        VERSION=1.0.0
+        #VERSION=1.0.0
         # copy + rename .so
-        find ./artifacts -name "*.so" | while read file; do
-          abi=$(basename $(dirname "$file"))
-          name=$(basename "$file" .so)
-          name=${name#lib}
-        
-          cp "$file" "release_assets/${name}-${COMMIT}-${VERSION}-${abi}.so"
-        done
+        find ./artifacts -name "*.so" -exec cp {} release_assets/ \;
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v3
