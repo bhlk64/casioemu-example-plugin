@@ -48,7 +48,7 @@ jobs:
       uses: actions/upload-artifact@v7
       with:
         # path: app/build/outputs/apk/release/*-universal-*.apk
-        path: *
+        path: .
         archive: false
 
     - name: Dump CMake error (if failed)
